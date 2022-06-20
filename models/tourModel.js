@@ -124,6 +124,7 @@ const tourSchema = new mongoose.Schema(
 // tourSchema.index({ price: 1 });
 tourSchema.index({ price: 1, ratingsAverage: -1 });
 tourSchema.index({ slug: 1 });
+tourSchema.index({ startLocation: '2dsphere' });
 
 tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
@@ -213,12 +214,25 @@ tourSchema.post(/^find/, function (docs, next) {
 
 // AGGREGATION MIDDLEWARE
 // also exclude the secret tour from the aggregation ....
-tourSchema.pre('aggregate', function (next) {
-  // add at the beginning of the array of stages of pipeline, before the first match in the getAllTours for example)
-  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
-  console.log(this.pipeline());
-  next();
-});
+// tourSchema.pre('aggregate', function (next) {
+//   // add at the beginning of the array of stages of pipeline, before the first match in the getAllTours for example)
+//   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+//   console.log(this.pipeline());
+//   next();
+// });
+
+tourSchema.statics.findToursWithin = async function (distance, center, unit) {
+  const distanceInRadius = distance / (unit === 'km' ? 6378.1 : 3963.2);
+  console.log('distanceInRadius', distanceInRadius);
+  const tours = await this.find({
+    startLocation: {
+      $geoWithin: {
+        $center: [center, distanceInRadius],
+      },
+    },
+  });
+  return tours;
+};
 
 const Tour = mongoose.model('Tour', tourSchema);
 

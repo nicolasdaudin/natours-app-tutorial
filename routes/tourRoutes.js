@@ -13,6 +13,9 @@ const {
   aliasShortestTours,
   getPossibleMonthlyIncome,
   getAllMonthlyIncome,
+  getToursWithin,
+  getDistances,
+  getToursAllLocationsWithin,
 } = require('../controllers/tourController');
 
 const { protect, restrictTo } = require('../controllers/authController');
@@ -51,6 +54,15 @@ router
   .route('/possible-monthly-income/:year/:month')
   .get(getPossibleMonthlyIncome);
 router.route('/all-monthly-income').get(getAllMonthlyIncome);
+
+// /tours-within/233/center/-40,45/unit/mi
+router
+  .route('/tours-within/:distance/center/:latlng/unit/:unit')
+  .get(getToursWithin);
+
+// /distances/34.111,-118.111/unit/mi
+router.route('/distances/:latlng/unit/:unit').get(getDistances);
+
 router
   .route('/')
   .get(getAllTours)

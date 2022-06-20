@@ -98,6 +98,74 @@ exports.createTour = factory.createOne(Tour);
 exports.updateTour = factory.updateOne(Tour);
 exports.deleteTour = factory.deleteOne(Tour);
 
+// /tours-distance/-40,45
+exports.getDistances = catchAsync(async (req, res, next) => {
+  const [lat, lng] = req.params.latlng.split(',');
+  const unit = req.params.unit;
+  if (!lat || !lng) {
+    next(
+      new AppError(
+        'Please provide latitude and longitude in the format lat,lng.',
+        400
+      )
+    );
+  }
+  const multiplier = unit === 'mi' ? 0.000621371 : 0.001; // conversion from radians to km or mi
+  console.log(lat, lng);
+
+  // const tours = [];
+  const distances = await Tour.aggregate([
+    {
+      $geoNear: {
+        near: {
+          type: 'Point',
+          coordinates: [lng * 1, lat * 1], // convert as number
+        },
+        distanceField: 'distance',
+        distanceMultiplier: multiplier, // we get in meters and we want km
+      },
+    },
+    {
+      $project: {
+        distance: 1,
+        name: 1,
+      },
+    },
+  ]);
+
+  res.status(200).json({
+    status: 'success',
+    results: distances.length,
+    data: { data: distances },
+  });
+});
+
+// /tours-within/233/center/-40,45/unit/mi
+
+exports.getToursWithin = catchAsync(async (req, res, next) => {
+  const { distance, latlng, unit } = req.params;
+  const [lat, lng] = latlng.split(',');
+  if (!lat || !lng) {
+    next(
+      new AppError(
+        'Please provide latitude and longitude in the format lat,lng.',
+        400
+      )
+    );
+  }
+  console.log(distance, lat, lng, unit);
+  const radius = unit === 'mi' ? distance / 3963.2 : distance / 6378.1;
+  const tours = await Tour.find({
+    startLocation: { $geoWithin: { $centerSphere: [[lng, lat], radius] } },
+  }); //findToursWithin(distance, center, unit);
+
+  res.status(200).json({
+    status: 'success',
+    results: tours.length,
+    data: { data: tours },
+  });
+});
+
 exports.getAllMonthlyIncome = catchAsync(async (req, res, next) => {
   const results = await Tour.aggregate([
     { $unwind: '$startDates' },
