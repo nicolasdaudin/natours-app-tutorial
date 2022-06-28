@@ -21,3 +21,7 @@ exports.getTour = catchAsync(async (req, res, next) => {
   console.log(tour);
   res.status(200).render('tour', { title: tour.name, tour });
 });
+
+exports.getLoginForm = (req, res) => {
+  res.status(200).render('login', { title: 'Log into your account' });
+};

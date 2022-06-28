@@ -6,6 +6,7 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
+const cookieParser = require('cookie-parser');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -28,8 +29,19 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(
   helmet.contentSecurityPolicy({
     directives: {
-      defaultSrc: ["'self'", 'blob:', 'https://*.mapbox.com'],
-      scriptSrc: ["'self'", 'https://*.mapbox.com', "'unsafe-inline'", 'blob:'],
+      defaultSrc: [
+        "'self'",
+        'blob:',
+        'https://*.mapbox.com',
+        'ws://localhost:58098/',
+      ],
+      scriptSrc: [
+        "'self'",
+        'https://*.mapbox.com',
+        'https://cdnjs.cloudflare.com',
+        "'unsafe-inline'",
+        'blob:',
+      ],
     },
   })
 );
@@ -51,7 +63,7 @@ app.use('/api', limiter); // only affect the API route
 // body parser, reading data from body into req.body
 // and limiting body size
 app.use(express.json({ limit: '10kb' })); // middleware to add body in the request data
-
+app.use(cookieParser());
 // Data sanitization against NoSQL query injection
 app.use(mongoSanitize());
 
@@ -83,6 +95,7 @@ app.use(
 // usefeul to take a look at the headers from time to time.
 app.use((req, res, next) => {
   req.requestTime = new Date();
+  console.log(req.cookies);
   // console.log(req.headers);
   next();
 });

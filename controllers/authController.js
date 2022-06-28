@@ -95,6 +95,17 @@ exports.login = catchAsync(async (req, res, next) => {
   // });
 });
 
+// the cookie we set up when creating the token is httpOnly, it means we can not delete this cookie from the browser, it's impossible. We can not manipulate it
+// see video 192. Logging Out Users
+// what we can do, is send back a cookie with the same name (we overwrite it), and with 10 seconds of expiration...
+exports.logout = (req, res) => {
+  res.cookie('jwt', 'loggedOut', {
+    expires: new Date(Date.now + 10 * 1000),
+    httpOnly: true,
+  });
+  res.status(200).json({ status: 'success' });
+};
+
 exports.protect = catchAsync(async (req, res, next) => {
   let token;
   // 1. check if there is a token
@@ -103,6 +114,9 @@ exports.protect = catchAsync(async (req, res, next) => {
     req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.split(' ')[1];
+  } else if (req.cookies.jwt) {
+    // if no token in the headers, we check the cookies
+    token = req.cookies.jwt;
   }
   // console.log(token);
 
@@ -147,6 +161,42 @@ exports.protect = catchAsync(async (req, res, next) => {
   req.user = currentUser;
   next();
 });
+
+// only for rendered pages (not for API)
+// it's not to protect routes,
+// there will be no error
+exports.isLoggedIn = async (req, res, next) => {
+  // used for rendered pages, so the token will be in the cookies
+  // the authorization header is only for the API
+  // we don't use catchAsync since we don't want to handle errors with the global error middleware, in that case, we want to handle them locally. Indeed there will be an error: when we log out we send the jwt token 'loggedOut' and upon jwt verificaiton error it will throw an error, thats why we want to catch it locally and 'ignore' it...
+  if (req.cookies.jwt) {
+    try {
+      // 1. verification of the token
+      const decoded = await promisify(jwt.verify)(
+        req.cookies.jwt,
+        process.env.JWT_SECRET
+      );
+
+      // 2. check if user still exists
+      const currentUser = await User.findById(decoded.id);
+      if (!currentUser) {
+        return next();
+      }
+
+      // 4. check if user changed password after token was issued
+      if (currentUser.changedPasswordAfter(decoded.iat)) {
+        return next();
+      }
+
+      // THERE IS A LOGGED IN USER
+      res.locals.user = currentUser; // to give access to pug to users
+      return next();
+    } catch (err) {
+      return next();
+    }
+  }
+  next();
+};
 
 exports.restrictTo = (...roles) => {
   return (req, res, next) => {
