@@ -159,6 +159,8 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   // GRANT ACCESS TO PROTECTED ROUTE
   req.user = currentUser;
+  res.locals.user = currentUser; // to give access to pug to users
+
   next();
 });
 
@@ -169,6 +171,7 @@ exports.isLoggedIn = async (req, res, next) => {
   // used for rendered pages, so the token will be in the cookies
   // the authorization header is only for the API
   // we don't use catchAsync since we don't want to handle errors with the global error middleware, in that case, we want to handle them locally. Indeed there will be an error: when we log out we send the jwt token 'loggedOut' and upon jwt verificaiton error it will throw an error, thats why we want to catch it locally and 'ignore' it...
+  // main difference between isLoggedIn and protect is that isLoggedIn will return even if there is no token (we just want to kjnow if user is logged in, to display accordingly the sign in and login buttons in the header). For 'protect' we want to allow access only to logged in users, so we will answer an error if the user is not logged in
   if (req.cookies.jwt) {
     try {
       // 1. verification of the token
