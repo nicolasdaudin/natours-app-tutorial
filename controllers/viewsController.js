@@ -1,6 +1,7 @@
 const Tour = require('../models/tourModel');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
+const User = require('../models/userModel');
 
 exports.getOverview = catchAsync(async (req, res, next) => {
   // 1) Get tour data from collection
@@ -30,3 +31,23 @@ exports.getLoginForm = (req, res) => {
 exports.getAccount = (req, res) => {
   res.status(200).render('me', { title: 'Your account' });
 };
+
+// in req.body we find data from the form
+exports.updateUserData = catchAsync(async (req, res, next) => {
+  const { name, email } = req.body;
+
+  const updatedUser = await User.findByIdAndUpdate(
+    req.user.id,
+    { name, email },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+
+  // req.user = updatedUser;
+  // res.locals.user = updatedUser; // to give access to pug to users
+  res
+    .status(200)
+    .render('me', { title: 'Your UPDATED account', user: updatedUser });
+});

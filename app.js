@@ -26,25 +26,25 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Set security HTTP headers
 // Special configuration for Helmet Content Security Policy, otherwise impossible to load Mapbox GL
 
-app.use(
-  helmet.contentSecurityPolicy({
-    directives: {
-      defaultSrc: [
-        "'self'",
-        'blob:',
-        'https://*.mapbox.com',
-        'ws://localhost:58098/',
-      ],
-      scriptSrc: [
-        "'self'",
-        'https://*.mapbox.com',
-        'https://cdnjs.cloudflare.com',
-        "'unsafe-inline'",
-        'blob:',
-      ],
-    },
-  })
-);
+// app.use(
+//   helmet.contentSecurityPolicy({
+//     directives: {
+//       defaultSrc: [
+//         "'self'",
+//         'blob:',
+//         'https://*.mapbox.com',
+//         'ws://localhost:58098/',
+//       ],
+//       scriptSrc: [
+//         "'self'",
+//         'https://*.mapbox.com',
+//         'https://cdnjs.cloudflare.com',
+//         "'unsafe-inline'",
+//         'blob:',
+//       ],
+//     },
+//   })
+// );
 
 // Development logging
 if (process.env.NODE_ENV === 'development') {
@@ -63,6 +63,7 @@ app.use('/api', limiter); // only affect the API route
 // body parser, reading data from body into req.body
 // and limiting body size
 app.use(express.json({ limit: '10kb' })); // middleware to add body in the request data
+app.use(express.urlencoded({ extended: true, limit: '10kb' })); // parse data from forms, extended is for more complicated data
 app.use(cookieParser());
 // Data sanitization against NoSQL query injection
 app.use(mongoSanitize());
@@ -95,7 +96,7 @@ app.use(
 // usefeul to take a look at the headers from time to time.
 app.use((req, res, next) => {
   req.requestTime = new Date();
-  console.log(req.cookies);
+  // console.log(req.cookies);
   // console.log(req.headers);
   next();
 });

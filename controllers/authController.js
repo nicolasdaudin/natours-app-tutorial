@@ -107,6 +107,8 @@ exports.logout = (req, res) => {
 };
 
 exports.protect = catchAsync(async (req, res, next) => {
+  console.log('calling protect');
+
   let token;
   // 1. check if there is a token
   if (
