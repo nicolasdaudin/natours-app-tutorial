@@ -9,3 +9,5 @@ dev-data
 coverage
 .eslintrc.json
 .cache
+public/js/bundle.js
+public/js/bundle.js.map
