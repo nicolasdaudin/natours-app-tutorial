@@ -51,3 +51,22 @@ exports.updateUserData = catchAsync(async (req, res, next) => {
     .status(200)
     .render('me', { title: 'Your UPDATED account', user: updatedUser });
 });
+
+exports.uploadProfilePic = async (req, res, next) => {
+  console.log('uploadProfilePic', req.file.path);
+
+  const updatedUser = await User.findByIdAndUpdate(
+    req.user.id,
+    { photo: req.file.filename },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+
+  console.log(updatedUser);
+
+  res
+    .status(200)
+    .render('me', { title: 'Your UPDATED account', user: updatedUser });
+};

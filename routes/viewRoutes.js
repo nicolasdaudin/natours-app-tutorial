@@ -1,6 +1,10 @@
 const express = require('express');
 const viewsController = require('../controllers/viewsController');
 const authController = require('../controllers/authController');
+const path = require('path');
+
+const multer = require('multer');
+const upload = multer({ dest: 'public/img/users' });
 
 const router = express.Router();
 
@@ -16,6 +20,13 @@ router.post(
   '/updateUserData',
   authController.protect,
   viewsController.updateUserData
+);
+
+router.post(
+  '/uploadProfilePic',
+  authController.protect,
+  upload.single('profilePic'),
+  viewsController.uploadProfilePic
 );
 
 module.exports = router;

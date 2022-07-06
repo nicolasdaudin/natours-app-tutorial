@@ -11,6 +11,7 @@ const logOutBtn = document.querySelector('.nav__el--logout');
 // const saveUserSettingsBtn = document.querySelector('.form-user-data .btn--api');
 const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
+const userProfilePicForm = document.querySelector('.form-photo-upload');
 
 // VALUES
 
@@ -36,9 +37,14 @@ if (userDataForm) {
   userDataForm.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
-    updateSettings({ name, email }, 'data');
+    const form = new FormData();
+    form.append('name', document.getElementById('name').value);
+    form.append('email', document.getElementById('email').value);
+    form.append('photo', document.getElementById('photo').files[0]);
+
+    console.log(form);
+
+    updateSettings(form, 'data');
   });
 }
 
@@ -61,5 +67,11 @@ if (userPasswordForm) {
       document.getElementById('password-confirm').value =
         '';
     userPasswordForm.querySelector('.btn--green').innerHTML = 'Save Password';
+  });
+}
+
+if (userProfilePicForm) {
+  userProfilePicForm.addEventListener('submit', (e) => {
+    // e.preventDefault();
   });
 }

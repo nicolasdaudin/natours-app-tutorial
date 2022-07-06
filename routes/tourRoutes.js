@@ -5,6 +5,8 @@ const {
   createTour,
   getTour,
   updateTour,
+  uploadTourImages,
+  resizeTourImages,
   deleteTour,
   aliasTopTours,
   getTourStats,
@@ -72,7 +74,13 @@ router.route('/practice').get(getAllToursPractice);
 router
   .route('/:id')
   .get(getTour)
-  .patch(protect, restrictTo('admin', 'lead-guide'), updateTour)
+  .patch(
+    protect,
+    restrictTo('admin', 'lead-guide'),
+    uploadTourImages,
+    resizeTourImages,
+    updateTour
+  )
   .delete(protect, restrictTo('admin', 'lead-guide'), deleteTour);
 
 module.exports = router;

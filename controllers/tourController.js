@@ -3,6 +3,8 @@ const APIFeatures = require('../utils/apiFeatures');
 const AppError = require('../utils/appError');
 const catchAsync = require('./../utils/catchAsync');
 const factory = require('./handlerFactory');
+const multer = require('multer');
+const sharp = require('sharp');
 // const tours = JSON.parse(
 //   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
 // );
@@ -15,6 +17,61 @@ const factory = require('./handlerFactory');
 //   }
 //   next();
 // };
+
+const multerStorage = multer.memoryStorage();
+
+const multerFileFilter = (req, file, cb) => {
+  // we filter only images
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
+
+const upload = multer({ storage: multerStorage, filter: multerFileFilter });
+
+exports.uploadTourImages = upload.fields([
+  { name: 'imageCover', maxCount: 1 },
+  { name: 'images', maxCount: 3 },
+]);
+
+exports.resizeTourImages = catchAsync(async (req, res, next) => {
+  console.log(req.files);
+  if (!req.files.imageCover || !req.files.images) return next();
+
+  // image cover
+  req.body.imageCover = `tour-${req.params.id}-${Date.now()}-cover.jpeg`;
+  // we force a parameter in the body, since in the next middleware we are going to use a Factory function, that will read req.body, to update the Tour. Putting it in the body will make it automatic that the imageCover and images are added.
+
+  await sharp(req.files.imageCover[0].buffer)
+    .resize(2000, 1333)
+    .toFormat('jpeg')
+    .jpeg({ quality: 90 })
+    .toFile(`public/img/tours/${req.body.imageCover}`);
+
+  // images
+  req.body.images = [];
+  // if we use forEach, async will not stop the process. It will not stop the code when asymc is inside the callback function of forEach.
+  // this way, we await all the promises at once, promises created by images.map(async ...)
+  await Promise.all(
+    req.files.images.map(async (image, i) => {
+      const filename = `tour-${req.params.id}-${Date.now()}-${i + 1}.jpeg`;
+
+      await sharp(image.buffer)
+        .resize(2000, 1333)
+        .toFormat('jpeg')
+        .jpeg({ quality: 90 })
+        .toFile(`public/img/tours/${filename}`);
+
+      req.body.images.push(filename);
+    })
+  );
+
+  console.log(req.body);
+
+  next();
+});
 
 exports.aliasTopTours = (req, res, next) => {
   req.query.limit = '5';
@@ -96,6 +153,7 @@ exports.getTour = factory.getOne(Tour, { path: 'reviews' });
 exports.createTour = factory.createOne(Tour);
 
 exports.updateTour = factory.updateOne(Tour);
+
 exports.deleteTour = factory.deleteOne(Tour);
 
 // /tours-distance/-40,45
