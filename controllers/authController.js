@@ -6,6 +6,7 @@ const User = require('../models/userModel');
 const AppError = require('../utils/appError');
 const sendEmail = require('../utils/email');
 const catchAsync = require('../utils/catchAsync');
+const Email = require('../utils/email');
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -45,6 +46,8 @@ exports.signup = catchAsync(async (req, res, next) => {
   // });
 
   const newUser = await User.create(req.body);
+
+  await new Email(newUser, 'www.natours.dev').sendWelcome();
 
   createSendToken(newUser, 201, res);
   // const token = signToken(newUser._id);
