@@ -11,3 +11,5 @@ coverage
 .cache
 public/js/bundle.js
 public/js/bundle.js.map
+public/bundle.js
+public/bundle.js.map
