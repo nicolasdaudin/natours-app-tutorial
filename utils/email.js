@@ -9,15 +9,22 @@ module.exports = class Email {
     this.to = user.email;
     this.firstName = user.name.split(' ')[0];
     this.url = url;
-    this.from = `Jonas Schmedtmann ${process.env.EMAIL_FROM}`;
+    this.from = `Nicolas Daudin - Natours ${process.env.EMAIL_FROM}`;
   }
 
   newTransport() {
     if (process.env.NODE_ENV === 'production') {
-      return 1;
+      // sendgrid
+      return nodemailer.createTransport({
+        service: 'SendGrid',
+        auth: {
+          user: process.env.EMAIL_SENDGRID_USERNAME,
+          pass: process.env.EMAIL_SENDGRID_PASSWORD,
+        },
+      });
     } else {
       return nodemailer.createTransport({
-        // service: 'Gmail',
+        // using mailtrap => mail stays "trap" and never get sent, but it allows to check the emails, tje content... everything.
         host: process.env.EMAIL_HOST,
         port: process.env.EMAIL_PORT,
         auth: {
@@ -54,5 +61,12 @@ module.exports = class Email {
 
   async sendWelcome() {
     await this.send('welcome', 'Welcome to Natours Family');
+  }
+
+  async sendResetPassword() {
+    await this.send(
+      'resetpassword',
+      'Your password reset token (valid for 10 min)'
+    );
   }
 };
