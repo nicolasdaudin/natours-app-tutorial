@@ -5,6 +5,7 @@ dist
 .DS_Store
 .prettierrc
 .env
+config.env
 dev-data
 coverage
 .eslintrc.json
