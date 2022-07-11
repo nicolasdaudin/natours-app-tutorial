@@ -3,11 +3,14 @@ import '@babel/polyfill'; // include the polyfill in the final bundle
 import { displayMap } from './mapbox';
 import { login, logout } from './login';
 import { updateSettings } from './updateSettings';
+import { bookTour } from './bookings';
 
 // DOM ELEMENTS
 const mapBox = document.getElementById('map');
 const loginForm = document.querySelector('.login-form .form');
 const logOutBtn = document.querySelector('.nav__el--logout');
+const bookTourBtn = document.querySelector('.book-tour');
+
 // const saveUserSettingsBtn = document.querySelector('.form-user-data .btn--api');
 const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
@@ -73,5 +76,13 @@ if (userPasswordForm) {
 if (userProfilePicForm) {
   userProfilePicForm.addEventListener('submit', (e) => {
     // e.preventDefault();
+  });
+}
+
+if (bookTourBtn) {
+  bookTourBtn.addEventListener('click', async (e) => {
+    bookTourBtn.textContent = 'Processing ...';
+    const tourId = e.target.dataset.tourId;
+    await bookTour(tourId);
   });
 }
