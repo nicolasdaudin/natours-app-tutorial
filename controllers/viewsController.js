@@ -16,7 +16,7 @@ exports.getOverview = catchAsync(async (req, res, next) => {
 
 exports.getTour = catchAsync(async (req, res, next) => {
   const slug = req.params.slug;
-  console.log(slug);
+  // console.log(slug);
   const tour = await Tour.findOne({ slug }).populate({
     path: 'reviews',
     fields: 'review rating user',
@@ -67,7 +67,7 @@ exports.updateUserData = catchAsync(async (req, res, next) => {
 });
 
 exports.uploadProfilePic = async (req, res, next) => {
-  console.log('uploadProfilePic', req.file.path);
+  // console.log('uploadProfilePic', req.file.path);
 
   const updatedUser = await User.findByIdAndUpdate(
     req.user.id,
@@ -78,7 +78,7 @@ exports.uploadProfilePic = async (req, res, next) => {
     }
   );
 
-  console.log(updatedUser);
+  // console.log(updatedUser);
 
   res
     .status(200)

@@ -9,7 +9,6 @@ exports.deleteOne = (Model) =>
     if (!doc) {
       return next(new AppError('No document found with that ID', 404));
     }
-    console.log('deleting document...');
 
     res.status(204).json({
       status: 'success',
@@ -27,10 +26,6 @@ exports.updateOne = (Model) =>
     if (!doc) {
       return next(new AppError('No document found with that ID', 404));
     }
-
-    // console.log(typeof Model);
-    // console.log(Model.constructor.name);
-    // console.log(Model.name);
 
     res.status(200).json({
       status: 'success',

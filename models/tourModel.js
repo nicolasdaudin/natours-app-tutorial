@@ -143,7 +143,7 @@ tourSchema.virtual('reviews', {
 // DOCUMENT MIDDLEWARE
 // runs before .save() and .create() but not before (insertMany)
 tourSchema.pre('save', function (next) {
-  console.log('pre save this', this);
+  // console.log('pre save this', this);
   next();
 });
 
@@ -167,7 +167,7 @@ tourSchema.pre('save', function (next) {
 // });
 
 tourSchema.post('save', function (doc, next) {
-  console.log('post save doc', doc);
+  // console.log('post save doc', doc);
   next();
 });
 
@@ -206,7 +206,7 @@ tourSchema.pre(/^find/, function (next) {
 
 // eslint-disable-next-line prefer-arrow-callback
 tourSchema.post(/^find/, function (docs, next) {
-  console.log(`Query took ${Date.now() - this.start} ms`);
+  // console.log(`Query took ${Date.now() - this.start} ms`);
   // console.log(docs);
 
   next();
@@ -223,7 +223,7 @@ tourSchema.post(/^find/, function (docs, next) {
 
 tourSchema.statics.findToursWithin = async function (distance, center, unit) {
   const distanceInRadius = distance / (unit === 'km' ? 6378.1 : 3963.2);
-  console.log('distanceInRadius', distanceInRadius);
+  // console.log('distanceInRadius', distanceInRadius);
   const tours = await this.find({
     startLocation: {
       $geoWithin: {

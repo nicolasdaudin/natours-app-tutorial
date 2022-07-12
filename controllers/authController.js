@@ -111,8 +111,6 @@ exports.logout = (req, res) => {
 };
 
 exports.protect = catchAsync(async (req, res, next) => {
-  console.log('calling protect');
-
   let token;
   // 1. check if there is a token
   if (
@@ -124,7 +122,6 @@ exports.protect = catchAsync(async (req, res, next) => {
     // if no token in the headers, we check the cookies
     token = req.cookies.jwt;
   }
-  // console.log(token);
 
   if (!token) {
     return next(
@@ -134,7 +131,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   // 2. verification of the token
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-  console.log(decoded);
+
   if (!decoded || !decoded.id) {
     return next(
       new AppError(
@@ -209,8 +206,6 @@ exports.isLoggedIn = async (req, res, next) => {
 
 exports.restrictTo = (...roles) => {
   return (req, res, next) => {
-    // console.log(roles);
-
     if (!roles.includes(req.user.role)) {
       return next(
         new AppError('You do not have permission to perform this action', 403)
@@ -263,18 +258,15 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 exports.resetPassword = catchAsync(async (req, res, next) => {
   // 1. get the user based on the token (we need to encrypt the token sent by the user and compare it to database, where we store only encrypted tokens)
 
-  // console.log(userToken);
   const hashedToken = crypto
     .createHash('sha256')
     .update(req.params.token)
     .digest('hex');
-  // console.log(encryptedUserToken);
 
   const user = await User.findOne({
     passwordResetToken: hashedToken,
     passwordResetExpires: { $gt: Date.now() },
   });
-  // console.log(user);
 
   // 2. if token has not expired, and there is a user, set the new password
   if (!user) {
@@ -303,8 +295,6 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
 
   // 1. get user
   const user = await User.findById(req.user._id).select('+password'); // add a field in the selected filter, a field that was not originally filtered (select: false)
-
-  console.log(user);
 
   // 2. POSTed current password is correct?
   if (!(await user.correctPassword(passwordCurrent, user.password))) {

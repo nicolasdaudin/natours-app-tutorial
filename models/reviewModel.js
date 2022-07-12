@@ -59,7 +59,7 @@ reviewSchema.statics.calcAverageRatings = async function (tourId) {
       },
     },
   ]);
-  console.log(stats);
+  // console.log(stats);
   if (stats.length > 0) {
     await Tour.findByIdAndUpdate(tourId, {
       ratingsQuantity: stats[0].nRating,
@@ -85,7 +85,7 @@ reviewSchema.pre(/^findOneAnd/, async function (next) {
   // this => access to the query so we execute the query here
   // we get the review doc before it is updated
   const review = await this.findOne();
-  console.log(review);
+  // console.log(review);
   this.review = review; //  basically passes the review from the pre to the post middleware
   next();
   // here the query has not been executed yet - we are in 'pre' middleware

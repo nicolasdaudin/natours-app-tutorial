@@ -45,10 +45,10 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 
 exports.createBookingCheckout = catchAsync(async (req, res, next) => {
   const { tour, user, price } = req.query;
-  console.log(tour, user, price);
+  // console.log(tour, user, price);
 
   const newbooking = await Booking.create({ tour, user, price });
-  console.log(newbooking);
+  // console.log(newbooking);
 
   // redirect to homepage
   res.redirect(`${req.protocol}://${req.get('host')}/`);

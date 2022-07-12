@@ -37,7 +37,6 @@ exports.uploadTourImages = upload.fields([
 ]);
 
 exports.resizeTourImages = catchAsync(async (req, res, next) => {
-  console.log(req.files);
   if (!req.files.imageCover || !req.files.images) return next();
 
   // image cover
@@ -68,8 +67,6 @@ exports.resizeTourImages = catchAsync(async (req, res, next) => {
     })
   );
 
-  console.log(req.body);
-
   next();
 });
 
@@ -89,11 +86,8 @@ exports.aliasShortestTours = (req, res, next) => {
 };
 
 exports.getAllToursPractice = catchAsync(async (req, res, next) => {
-  console.log(req.query);
-
   // filter
   const { page, sort, limit, fields, ...queryObj } = req.query;
-  console.log('queryObj', queryObj);
 
   // transform advanced filters in queryObj
   let queryString = JSON.stringify(queryObj);
@@ -101,12 +95,10 @@ exports.getAllToursPractice = catchAsync(async (req, res, next) => {
     /\b(gt|gte|lt|lte|ne)\b/g,
     (match) => `$${match}`
   );
-  // console.log(JSON.parse(queryString));
 
   let query = Tour.find(JSON.parse(queryString));
 
   // sort
-  console.log('sort', sort);
   if (sort) {
     query = query.sort(sort.split(',').join(' '));
   } else {
@@ -169,7 +161,6 @@ exports.getDistances = catchAsync(async (req, res, next) => {
     );
   }
   const multiplier = unit === 'mi' ? 0.000621371 : 0.001; // conversion from radians to km or mi
-  console.log(lat, lng);
 
   // const tours = [];
   const distances = await Tour.aggregate([
@@ -211,7 +202,7 @@ exports.getToursWithin = catchAsync(async (req, res, next) => {
       )
     );
   }
-  console.log(distance, lat, lng, unit);
+  // console.log(distance, lat, lng, unit);
   const radius = unit === 'mi' ? distance / 3963.2 : distance / 6378.1;
   const tours = await Tour.find({
     startLocation: { $geoWithin: { $centerSphere: [[lng, lat], radius] } },
@@ -260,7 +251,7 @@ exports.getAllMonthlyIncome = catchAsync(async (req, res, next) => {
   ]);
 
   // TODO: calculer le income par an et par mois, au lieu de sélectionner le mois et l'année?
-  console.log();
+  // console.log();
 
   res.status(200).json({
     status: 'success',
@@ -270,7 +261,7 @@ exports.getAllMonthlyIncome = catchAsync(async (req, res, next) => {
 });
 
 exports.getPossibleMonthlyIncome = catchAsync(async (req, res, next) => {
-  console.log(req);
+  // console.log(req);
 
   const results = await Tour.aggregate([
     { $unwind: '$startDates' },
@@ -296,7 +287,7 @@ exports.getPossibleMonthlyIncome = catchAsync(async (req, res, next) => {
   ]);
 
   // TODO: calculer le income par an et par mois, au lieu de sélectionner le mois et l'année?
-  console.log();
+  // console.log();
 
   res.status(200).json({
     status: 'success',
