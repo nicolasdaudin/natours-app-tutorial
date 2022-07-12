@@ -74,6 +74,13 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
+// // virtual populate
+// userSchema.virtual('bookings', {
+//   ref: 'Booking',
+//   localField: '_id',
+//   foreignField: 'user',
+// });
+
 userSchema.pre('save', function (next) {
   if (!this.isModified('password') || this.isNew) return next();
   // this.isNew is true when it is a new document that is being saved
