@@ -43,6 +43,13 @@ process.on('unhandledRejection', (err) => {
   });
 });
 
+process.on('SIGTERM', () => {
+  console.log('👋🏾 SIGTERM RECEIVED. Shutting down gracefully ... ');
+  server.close(() => {
+    console.log('💥 Process terminated!');
+  });
+});
+
 /*
 
 tail -f /usr/local/var/log/mongodb/mongo.log | jq --compact-output -r -C '.msg |= sub("\n";"") | .t."$date"+" "+.c+" ["+.ctx+"] "+.msg, .attr | select(.!=null)'
