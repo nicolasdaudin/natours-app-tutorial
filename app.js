@@ -16,12 +16,23 @@ const reviewRouter = require('./routes/reviewRoutes');
 const viewRouter = require('./routes/viewRoutes');
 const bookingRouter = require('./routes/bookingRoutes');
 const compression = require('compression');
+const cors = require('cors');
 
 const app = express();
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
 // 1. GLOBAL MIDDLEWARES
+
+// implementing CORS
+app.use(cors());
+// Access-Control-Allow-Origin *
+// implementing it everywhere, but we could also implementing it - allowing it - on specific routes
+// app.use(cors({ origin: 'httops://www.natours.com' }));
+// in the case above, we only allow requests from natours.com (for example if our api was at api.natours.com, that would be necessary to allow requests from natours.com, since CORS also considers subdomains as different origin)
+// this works for standard requests like GET and POST but not for more complex one like PATCH DELETE PUT. In these cases there is a PREFLIGHT request, made to OPTIONS route, to check if the route is safe. In that case we need to allow CORS on OPTIONS route
+app.options('*', cors());
+
 // serving static files
 app.use(express.static(path.join(__dirname, 'public')));
 
