@@ -14,7 +14,7 @@ const signToken = (id) => {
   });
 };
 
-const createSendToken = (user, statusCode, res) => {
+const createSendToken = (user, statusCode, req, res) => {
   const token = signToken(user._id);
 
   const cookieOptions = {
@@ -23,8 +23,10 @@ const createSendToken = (user, statusCode, res) => {
     ),
     // secure: true, // only activate it in production, see below
     httpOnly: true, // can not be accessed or modified by the browser. The browser will only store it and send it automatically at every request
+    secure: req.secure || req.headers['x-forward-proto'] === 'https',
   };
-  if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+  // before Heroku
+  // if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
 
   res.cookie('jwt', token, cookieOptions);
 
@@ -50,7 +52,7 @@ exports.signup = catchAsync(async (req, res, next) => {
   const url = `${req.protocol}://${req.get('host')}/me`;
   await new Email(newUser, url).sendWelcome();
 
-  createSendToken(newUser, 201, res);
+  createSendToken(newUser, 201, req, res);
   // const token = signToken(newUser._id);
 
   // res.status(201).json({
@@ -85,7 +87,7 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError('Incorrect email or password', 401));
   }
 
-  createSendToken(user, 200, res);
+  createSendToken(user, 200, req, res);
 
   // // password is correct, we create a token with the id?
   // const token = signToken(user._id);
@@ -285,7 +287,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
   // 4. log the user in, send JWT
 
-  createSendToken(user, 200, res);
+  createSendToken(user, 200, req, res);
 });
 
 // only for logged-in users
@@ -312,5 +314,5 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   await user.save();
   // findByIdAndUpdate will NOTwork as intended. NEver use findByIdAndUpdate for passwords : update does not perform validators or middleware 'save' (this is where we check the password confirm and add the password change date)
 
-  createSendToken(user, 200, res);
+  createSendToken(user, 200, req, res);
 });
