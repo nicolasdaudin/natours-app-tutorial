@@ -24,7 +24,7 @@ export const login = async (email, password) => {
       console.log(error.response.data);
       console.log(error.response.status);
       console.log(error.response.headers);
-      showAlert('error', error.response.status);
+      showAlert('error', error.response.data.message);
     } else if (error.request) {
       console.log('Error request', error.request);
     } else {
