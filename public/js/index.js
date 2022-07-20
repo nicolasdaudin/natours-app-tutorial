@@ -4,12 +4,14 @@ import { displayMap } from './mapbox';
 import { login, logout } from './login';
 import { updateSettings } from './updateSettings';
 import { bookTour } from './bookings';
+import { showAlert } from './alerts';
 
 // DOM ELEMENTS
 const mapBox = document.getElementById('map');
 const loginForm = document.querySelector('.login-form .form');
 const logOutBtn = document.querySelector('.nav__el--logout');
 const bookTourBtn = document.querySelector('.book-tour');
+const body = document.querySelector('body');
 
 // const saveUserSettingsBtn = document.querySelector('.form-user-data .btn--api');
 const userDataForm = document.querySelector('.form-user-data');
@@ -85,4 +87,8 @@ if (bookTourBtn) {
     const tourId = e.target.dataset.tourId;
     await bookTour(tourId);
   });
+}
+
+if (body.dataset.alert) {
+  showAlert('success', body.dataset.alert);
 }

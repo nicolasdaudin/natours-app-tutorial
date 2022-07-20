@@ -4,6 +4,15 @@ const catchAsync = require('../utils/catchAsync');
 const User = require('../models/userModel');
 const Booking = require('../models/bookingModel');
 
+exports.alerts = (req, res, next) => {
+  // if there is an alert param, put the corresponding alert message in the pug template
+  const alert = req.query.alert;
+  if (alert === 'booking') {
+    res.locals.alert = `Your booking has been completed. Please reload if it doesn't appear yet. It might take a few seconds to appear`;
+  }
+  next();
+};
+
 exports.getOverview = catchAsync(async (req, res, next) => {
   // 1) Get tour data from collection
   const tours = await Tour.find();

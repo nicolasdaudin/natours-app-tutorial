@@ -9,6 +9,8 @@ const upload = multer({ dest: 'public/img/users' });
 
 const router = express.Router();
 
+router.use(viewsController.alerts);
+
 // PUG ROUTES
 router.get('/', authController.isLoggedIn, viewsController.getOverview);
 router.get('/tour/:slug', authController.isLoggedIn, viewsController.getTour);
