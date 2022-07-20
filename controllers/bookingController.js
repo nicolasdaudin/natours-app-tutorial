@@ -1,4 +1,6 @@
 const Tour = require('../models/tourModel');
+const User = require('../models/userModel');
+
 const AppError = require('../utils/appError');
 const catchAsync = require('./../utils/catchAsync');
 const factory = require('./handlerFactory');
@@ -47,7 +49,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 const createBookingCheckout = async (session) => {
   console.log('createBookingCheckout');
   const tour = session.client_reference_id;
-  const user = (await User.find({ email: session.customer_email })).id;
+  const user = (await User.find({ email: session.customer_email }))[0].id;
   const price = session.line_items[0].amount / 100;
 
   console.log(tour, user, price);
