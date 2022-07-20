@@ -15,7 +15,7 @@ const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
 const viewRouter = require('./routes/viewRoutes');
 const bookingRouter = require('./routes/bookingRoutes');
-const bookingController = require('./controller/bookingController');
+const bookingController = require('./controllers/bookingController');
 const compression = require('compression');
 const cors = require('cors');
 
